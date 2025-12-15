@@ -9,4 +9,5 @@ def base2tobase10(binary):
     
     for i in range(0,len(base2)):
         base10 += int(base2[i])*(2**i)
-    print(base10)
+
+    return base10
