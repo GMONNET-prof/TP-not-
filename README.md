@@ -1,4 +1,4 @@
-# TP-not-
+# TP-noté-
 Ecrire une fonction qui : 
   - demande une IP et un Masque à l'utilisateur.rice
   - affiche l'IP du réseau
