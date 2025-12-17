@@ -6,6 +6,10 @@ This is a temporary script file.
 """
 
 def convertion(IP):
+    """convertie l'ip en binaire
+       Entre: IP en base 10
+       Sortie: IP en binaire
+    """
     nb = IP.split(".")
     IP_en_binaire = ""
     for elem in nb:
@@ -15,6 +19,7 @@ def convertion(IP):
         IP_en_binaire += morceau
     IP_en_binaire = IP_en_binaire[:-1]
     return IP_en_binaire
+
 
 
 def reconvertion(chaine):
@@ -69,23 +74,91 @@ def trouve_IP_diffusion(IP_en_binaire,masque):
     
     return nouvelle_chaine
 
-def IP_routeur(IP_en_binaire,masque):
-    ...
+
+
+
+def IP_routeur(IP_diffusion):
+    """ Retourne l'IP du routeur a partir de l'ip de diffusion
+        Entrée : IP binaire (str)
+        Sortie : chaine en base 10 (str)"""
+    liste_finale = []
+    liste_morceaux = IP_diffusion.split(".")
+    assert len(liste_morceaux) == 4, "erreur dans l'IP"
+    for nombre in liste_morceaux :
+        puiss = len(nombre) - 1 
+        res = 0
+        for carac in nombre :
+            res = res + int(carac) * 2 ** puiss
+            puiss -= 1
+        liste_finale.append(str(res))
+    dernier_nombre = int(liste_finale[-1])
+    dernier_nombre -= 1
+    liste_finale[-1] = str(dernier_nombre)
+    return ".".join(liste_finale)
     
 
+def IP_dhcp(IP_reseau):
+    """ Retourne l'IP du DHCP a partir de l'ip du reseau
+        Entrée : IP binaire (str)
+        Sortie : chaine en base 10 (str)"""
+    liste_finale = []
+    liste_morceaux = IP_reseau.split(".")
+    assert len(liste_morceaux) == 4, "erreur dans l'IP"
+    for nombre in liste_morceaux :
+        puiss = len(nombre) - 1 
+        res = 0
+        for carac in nombre :
+            res = res + int(carac) * 2 ** puiss
+            puiss -= 1
+        liste_finale.append(str(res))
+    dernier_nombre = int(liste_finale[-1])
+    dernier_nombre += 1
+    liste_finale[-1] = str(dernier_nombre)
+    return ".".join(liste_finale)
+
+
 def nb_machine_reseau(masque):
-   nb_machine = 2**32-masque
-   return(nb_machine)
+    """retourne le nombre de machine disponible sur le resau
+       Entree: masque est un nombre entier (int)
+       Sortie:
+    """
+    nb_machine = 2**32-masque
+    return(nb_machine)
+
     
-    
+def plage_adressable(IP_en_binaire,masque):
+    """ retourne la plage d'adresses utilisables du réseau
+        Entrée : IP en binaire (chaine) et masque (int)
+        Sortie : IP_debut, IP_fin en binaire
+    """
+    debut = IP_dhcp(trouve_IP_reseau(monIP1, masque1))
+    fin = IP_routeur(trouve_IP_diffusion(monIP1, masque1))
+    return debut, fin  
 
 if __name__ == '__main__' :
     # les tests 
-    monIP1 = "01011011.10011011.10111000.00111001" #91.155.184.57
-    masque1 = 15
-    IP10 = "193.156.12.5"
-    print(convertion(IP10))
-    # print(trouve_IP_reseau(monIP1, masque1))
-    # print(trouve_IP_diffusion(monIP1, masque1))
-    
-    # print("les tests sont validés") 
+    #monIP1 = "91.155.184.57" #91.155.184.57
+    monIP1 = str(input("Entrez votre ip svp: "))
+    compteur_de_points = 0
+    for elmt in monIP1:
+        if elmt == ".":
+            compteur_de_points += 1
+    if compteur_de_points != 3:
+        print ("votre ip n'est pas valide")
+    else:
+        masque1 = int(input("Entrez votre masque: "))
+        if masque1 < 0 or masque1 > 32:
+            print("le masque n'est pas valide")
+        else:
+            monIP1 = "01011011.10011011.10111000.00111001" #91.155.184.57
+            IP10 = "193.156.12.5"
+            print(convertion(IP10))
+            IP_res = trouve_IP_reseau(monIP1, masque1)
+            print("l'IP du reseau est :",IP_res)
+            IP_diff = trouve_IP_diffusion(monIP1, masque1)
+            #print(IP_diff)
+            print("l'IP du routeur est :",IP_routeur(IP_diff))
+            print("l'IP du DHCP est :",IP_dhcp(IP_res))
+            print(plage_adressable(monIP1,masque1))
+            
+            print("les tests sont validés") 
